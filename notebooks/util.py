@@ -384,7 +384,7 @@ def get_MOM_grid(gridname):
         ds["TAREA"].attrs["units"] = "cm^2"
         
         # Add z_t to dataset
-        ds["z_t"] = z_t
+        ds = ds.assign_coords({"z_t": z_t.data, "z_w_bot": z_w.data[1:]})
         
         # Compute KMT
         KMT = np.zeros_like(ocn_depth, dtype="int32")
@@ -399,8 +399,7 @@ def get_MOM_grid(gridname):
         
     return None
 
-def reintegrate_z_t_to_MOM(da, src_grid):
-    src_ds = pop_tools.get_grid(src_grid)
+def reintegrate_z_t_to_MOM(da, src_ds):
     src_z_t = src_ds.z_t
     src_z_w = xr.DataArray(np.concatenate(([0], src_ds.z_w_bot.data)), dims='z_w')
     dst_z_t, dst_z_w = get_WOA_zt_and_zw()
